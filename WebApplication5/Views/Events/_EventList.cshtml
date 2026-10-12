@@ -1,0 +1,37 @@
+@model IEnumerable<WebApplication5.Models.Event>
+@using System.Linq
+
+@if (!Model.Any())
+{
+    <p>Подходящих мероприятий не найдено.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Название</th>
+                    <th>Категория</th>
+                    <th>Дата</th>
+                    <th>Цена</th>
+                    <th>Мест</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Title</td>
+                    <td>@item.Category.Name</td>
+                    <td>@item.StartDate.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>@item.Price.ToString("C")</td>
+                    <td>@item.Seats</td>
+                    <td>@Html.ActionLink("Подробнее", "Details", new { id = item.Id })</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}

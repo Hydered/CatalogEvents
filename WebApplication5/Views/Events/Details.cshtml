@@ -1,0 +1,67 @@
+@model WebApplication5.Models.Event
+@{
+    ViewBag.Title = Model.Title;
+}
+
+<h1>@Model.Title</h1>
+<dl class="row">
+    <dt class="col-sm-3">Категория</dt><dd class="col-sm-9">@Model.Category.Name</dd>
+    <dt class="col-sm-3">Описание</dt><dd class="col-sm-9">@Model.Description</dd>
+    <dt class="col-sm-3">Дата и время</dt><dd class="col-sm-9">@Model.StartDate.ToString("dd.MM.yyyy HH:mm")</dd>
+    <dt class="col-sm-3">Цена</dt><dd class="col-sm-9">@Model.Price.ToString("C")</dd>
+    <dt class="col-sm-3">Количество мест</dt><dd class="col-sm-9">@Model.Seats</dd>
+    <dt class="col-sm-3">Опубликовано</dt><dd class="col-sm-9" id="publish-status">@(Model.IsPublished ? "Да" : "Нет")</dd>
+</dl>
+
+<button type="button" class="btn btn-primary" id="check-seats" data-event-id="@Model.Id">Проверить наличие мест</button>
+<p id="seats-result" class="mt-3" aria-live="polite"></p>
+
+@if (Request.IsAuthenticated)
+{
+    using (Html.BeginForm("TogglePublished", "Events", new { id = Model.Id }, FormMethod.Post, new { id = "publish-form", @class = "d-inline" }))
+    {
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-outline-secondary">@(Model.IsPublished ? "Снять с публикации" : "Опубликовать")</button>
+    }
+    <p id="publish-result" class="mt-2" aria-live="polite"></p>
+    @Html.ActionLink("Редактировать", "Edit", new { id = Model.Id }, new { @class = "btn btn-outline-primary ms-2" })
+    @Html.ActionLink("Удалить", "Delete", new { id = Model.Id }, new { @class = "btn btn-outline-danger ms-2" })
+    using (Html.BeginForm("Logout", "Account", FormMethod.Post, new { @class = "d-inline ms-2" }))
+    {
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-link">Выйти</button>
+    }
+}
+
+<p class="mt-3">@Html.ActionLink("К списку мероприятий", "Index")</p>
+
+@section scripts {
+    <script>
+        document.getElementById('check-seats').addEventListener('click', function () {
+            var eventId = this.getAttribute('data-event-id');
+            $.get('@Url.Action("CheckSeats", "Events")', { id: eventId })
+                .done(function (data) {
+                    $('#seats-result').text(data.Title + ': ' + data.FreeSeats + ' свободных мест, ' + data.Status + '.');
+                })
+                .fail(function () { $('#seats-result').text('Не удалось проверить наличие мест.'); });
+        });
+
+        var publishForm = document.getElementById('publish-form');
+        if (publishForm) {
+            publishForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+                $.post(publishForm.action, $(publishForm).serialize())
+                    .done(function (result) {
+                        if (result.success) {
+                            $('#publish-status').text(result.isPublished ? 'Да' : 'Нет');
+                            $(publishForm).find('button[type="submit"]').text(result.isPublished ? 'Снять с публикации' : 'Опубликовать');
+                            $('#publish-result').text('Публикация обновлена.');
+                        } else {
+                            $('#publish-result').text('Не удалось изменить публикацию.');
+                        }
+                    })
+                    .fail(function () { $('#publish-result').text('Не удалось изменить публикацию.'); });
+            });
+        }
+    </script>
+}

@@ -1,0 +1,18 @@
+@model WebApplication5.Models.Event
+@{
+    ViewBag.Title = "Удаление мероприятия";
+}
+
+<h1>Удаление мероприятия</h1>
+<p>Удалить мероприятие «@Model.Title»?</p>
+<dl class="row">
+    <dt class="col-sm-3">Категория</dt><dd class="col-sm-9">@Model.Category.Name</dd>
+    <dt class="col-sm-3">Дата</dt><dd class="col-sm-9">@Model.StartDate.ToString("dd.MM.yyyy HH:mm")</dd>
+</dl>
+@using (Html.BeginForm("Delete", "Events", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.Hidden("id", Model.Id)
+    <button type="submit" class="btn btn-danger">Удалить</button>
+    @Html.ActionLink("Отмена", "Details", new { id = Model.Id }, new { @class = "btn btn-link" })
+}

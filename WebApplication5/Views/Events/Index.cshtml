@@ -1,0 +1,65 @@
+@model IEnumerable<WebApplication5.Models.Event>
+@{
+    ViewBag.Title = "Каталог мероприятий";
+    var categories = ViewBag.Categories as IEnumerable<WebApplication5.Models.Category>;
+}
+
+<h1>Каталог мероприятий</h1>
+<p class="text-muted">Время формирования страницы: @DateTime.Now.ToString("HH:mm:ss")</p>
+<p>@Html.ActionLink("Создать мероприятие", "Create", null, new { @class = "btn btn-outline-primary" })</p>
+
+<div class="row g-2 mb-4" id="event-filters">
+    <div class="col-md-3">
+        <label for="category-filter" class="form-label">Категория</label>
+        <select id="category-filter" class="form-select">
+            <option value="">Все категории</option>
+            @foreach (var category in categories)
+            {
+                <option value="@category.Id">@category.Name</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <label for="min-price-filter" class="form-label">Цена от</label>
+        <input id="min-price-filter" class="form-control" type="number" min="0" step="0.01" />
+    </div>
+    <div class="col-md-2">
+        <label for="max-price-filter" class="form-label">Цена до</label>
+        <input id="max-price-filter" class="form-control" type="number" min="0" step="0.01" />
+    </div>
+    <div class="col-md-5">
+        <label for="search-filter" class="form-label">Название</label>
+        <input id="search-filter" class="form-control" type="search" placeholder="Поиск по названию" />
+    </div>
+</div>
+
+<div id="event-list" aria-live="polite">
+    @Html.Partial("_EventList", Model)
+</div>
+
+@section scripts {
+    <script>
+        (function () {
+            var timer;
+            var filters = document.getElementById('event-filters');
+
+            function updateList() {
+                var data = {
+                    categoryId: document.getElementById('category-filter').value,
+                    minPrice: document.getElementById('min-price-filter').value,
+                    maxPrice: document.getElementById('max-price-filter').value,
+                    search: document.getElementById('search-filter').value
+                };
+                $.get('@Url.Action("Filter", "Events")', data)
+                    .done(function (html) { $('#event-list').html(html); })
+                    .fail(function () { $('#event-list').text('Не удалось загрузить мероприятия. Обновите страницу и попробуйте снова.'); });
+            }
+
+            filters.addEventListener('change', updateList);
+            document.getElementById('search-filter').addEventListener('input', function () {
+                window.clearTimeout(timer);
+                timer = window.setTimeout(updateList, 250);
+            });
+        }());
+    </script>
+}

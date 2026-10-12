@@ -1,0 +1,26 @@
+@model WebApplication5.Models.Event
+@{
+    ViewBag.Title = "Новое мероприятие";
+}
+
+<h1>Новое мероприятие</h1>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    if (ViewData.ModelState.ContainsKey("") && ViewData.ModelState[""].Errors.Count > 0)
+    {
+        <div class="alert alert-danger" role="alert">
+            <strong>Не удалось сохранить мероприятие:</strong>
+            @Html.ValidationSummary(true, null, new { @class = "mb-0" })
+        </div>
+    }
+    <div class="mb-3">@Html.LabelFor(model => model.Title, "Название", new { @class = "form-label" })@Html.TextBoxFor(model => model.Title, new { @class = "form-control", required = "required", maxlength = "200", pattern = @".*\S.*" })@Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })</div>
+    <div class="mb-3">@Html.LabelFor(model => model.Description, "Описание", new { @class = "form-label" })@Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = 5, maxlength = "4000" })@Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })</div>
+    <div class="mb-3">@Html.LabelFor(model => model.StartDate, "Дата и время", new { @class = "form-label" })@Html.TextBoxFor(model => model.StartDate, "{0:yyyy-MM-ddTHH:mm}", new { @class = "form-control", type = "datetime-local", required = "required", min = "2000-01-01T00:00", max = "2099-12-31T23:59" })@Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "text-danger" })</div>
+    <div class="mb-3">@Html.LabelFor(model => model.Price, "Цена", new { @class = "form-label" })@Html.TextBoxFor(model => model.Price, new { @class = "form-control", type = "number", required = "required", min = "0", max = "1000000", step = "0.01" })@Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })</div>
+    <div class="mb-3">@Html.LabelFor(model => model.Seats, "Количество мест", new { @class = "form-label" })@Html.TextBoxFor(model => model.Seats, new { @class = "form-control", type = "number", required = "required", min = "1", max = "100000", step = "1" })@Html.ValidationMessageFor(model => model.Seats, "", new { @class = "text-danger" })</div>
+    <div class="mb-3">@Html.LabelFor(model => model.CategoryId, "Категория", new { @class = "form-label" })@Html.DropDownList("CategoryId", null, "Выберите категорию", new { @class = "form-select", required = "required" })@Html.ValidationMessageFor(model => model.CategoryId, "", new { @class = "text-danger" })</div>
+    <div class="form-check mb-3">@Html.CheckBoxFor(model => model.IsPublished, new { @class = "form-check-input" })@Html.LabelFor(model => model.IsPublished, "Опубликовано", new { @class = "form-check-label" })</div>
+    <button type="submit" class="btn btn-primary">Создать</button>
+    @Html.ActionLink("Отмена", "Index", null, new { @class = "btn btn-link" })
+}

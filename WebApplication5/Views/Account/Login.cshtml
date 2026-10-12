@@ -1,0 +1,26 @@
+@{
+    ViewBag.Title = "Вход администратора";
+}
+
+<h1>Вход администратора</h1>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger" role="alert">
+            <strong>Не удалось выполнить вход.</strong>
+            @Html.ValidationSummary(true, null, new { @class = "mb-0" })
+        </div>
+    }
+    @Html.Hidden("returnUrl", (string)ViewBag.ReturnUrl)
+    <div class="mb-3">
+        <label for="username" class="form-label">Имя пользователя</label>
+        <input id="username" name="username" class="form-control" autocomplete="username" required />
+    </div>
+    <div class="mb-3">
+        <label for="password" class="form-label">Пароль</label>
+        <input id="password" name="password" type="password" class="form-control" autocomplete="current-password" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Войти</button>
+}
